@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Deck creator beta</title>
+    <style>
+      sup {
+        font-size: 0.9rem;
+      }
+
+      div {
+        font-size: 2rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>
+      Flush Game <sup>Beta</sup> <button onclick="begin()">Shuffle</button>
+    </h1>
+
+    <div id="user"></div>
+    <br />
+    <hr />
+    <br />
+    <div id="dealer"></div>
+
+    <script>
+      let deck = []; //Empty array
+      let card;
+      for (counter = 1; counter <= 4; counter++) {
+        let suite =
+          counter === 1 ? "♠" : counter === 2 ? "♣" : counter === 3 ? "♦" : "♥";
+        for (c = 2, value = 1; c <= 14; c++, value++) {
+          card =
+            c === 11
+              ? "J"
+              : c === 12
+              ? "Q"
+              : c === 13
+              ? "K"
+              : c === 14
+              ? "A"
+              : c;
+          deck.push({ card: card, value: value, symbol: suite });
+        }
+        //Above loop creates the deck perfectly with card name ,value and syombol/suite
+      }
+      function begin() {
+        let temporarydeck = deck.sort((a, b) => 0.5 - Math.random());
+        let shuffled = temporarydeck.sort((a, b) => 0.5 - Math.random());
+
+        //user gets these
+
+        var userArray = [shuffled[0], shuffled[1], shuffled[2]].sort(
+          (a, b) => a.value - b.value
+        );
+
+        //dealer gets these
+
+        var dealerArray = [shuffled[3], shuffled[4], shuffled[5]].sort(
+          (a, b) => a.value - b.value
+        );
+        let s = " ";
+
+        //Print the array on the document
+
+        document.getElementById("user").innerHTML =
+          "User cards :" +
+          userArray[0].card +
+          userArray[0].symbol +
+          s +
+          userArray[1].card +
+          userArray[1].symbol +
+          s +
+          userArray[2].card +
+          userArray[2].symbol;
+
+        document.getElementById("dealer").innerHTML =
+          "Dealer cards :" +
+          dealerArray[0].card +
+          dealerArray[0].symbol +
+          s +
+          dealerArray[1].card +
+          dealerArray[1].symbol +
+          s +
+          dealerArray[2].card +
+          dealerArray[2].symbol;
+
+        //check trio function
+
+        function trio(array) {
+          return array[0].card === array[1].card &&
+            array[0].card === array[2].card
+            ? true
+            : false;
+        }
+
+        //check flush function
+        function flush(array) {
+          return array[0].symbol === array[1].symbol &&
+            array[0].symbol === array[2].symbol
+            ? true
+            : false;
+        }
+
+        //check sequence function
+        function sequence(array) {
+          return array[0].value + 1 === array[1].value &&
+            array[0].value + 2 === array[2].value
+            ? true
+            : false;
+        }
+
+        //check pure sequence function
+        function pureSequence(array) {
+          return sequence(array) && flush(array) ? true : false;
+        }
+
+        //check pair function
+        function pair(array) {
+          return array[0].card === array[1].card ||
+            array[0].card === array[2].card ||
+            array[1].card === array[2].card
+            ? true
+            : false;
+        }
+
+        //Clear console
+        console.clear();
+
+        //testing logs user
+        console.log(trio(userArray) + " User trio");
+        console.log(flush(userArray) + " User flush");
+        console.log(sequence(userArray) + " User sequence");
+        console.log(pureSequence(userArray) + " User pure sequence");
+        console.log(pair(userArray) + " User pair");
+
+        //testing logs dealer
+        console.log("-------------------------");
+        //adding a horizontal line for testing pursposes
+
+        console.log(trio(dealerArray) + " Dealer trio");
+        console.log(flush(dealerArray) + " Dealer flush");
+        console.log(sequence(dealerArray) + " Dealer sequence");
+        console.log(pureSequence(dealerArray) + " Dealer pure sequence");
+        console.log(pair(dealerArray) + " Dealer pair");
+      }
+    </script>
+  </body>
+</html>
