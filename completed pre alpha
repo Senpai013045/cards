@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Deck creator beta</title>
+    <style>
+      sup {
+        font-size: 0.9rem;
+      }
+
+      div {
+        font-size: 2rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>
+      Flush Game
+      <sup>
+        <strike title="It's nowhere near beta you lazy ass">Beta</strike> Pre
+        alpha</sup
+      >
+      <button onclick="begin()">Shuffle</button>
+    </h1>
+
+    <div id="user"></div>
+    <br />
+    <hr />
+    <br />
+    <div id="dealer"></div>
+
+    <script>
+      let deck = []; //Empty array
+      let card;
+      for (counter = 1; counter <= 4; counter++) {
+        let suite =
+          counter === 1 ? "♠" : counter === 2 ? "♣" : counter === 3 ? "♦" : "♥";
+        for (c = 2, value = 1; c <= 14; c++, value++) {
+          card =
+            c === 11
+              ? "J"
+              : c === 12
+              ? "Q"
+              : c === 13
+              ? "K"
+              : c === 14
+              ? "A"
+              : c;
+          deck.push({ card: card, value: value, symbol: suite });
+        }
+        //Above loop creates the deck perfectly with card name ,value and syombol/suite
+      }
+      function begin() {
+        let temporarydeck = deck.sort((a, b) => 0.5 - Math.random());
+        let shuffled = temporarydeck.sort((a, b) => 0.5 - Math.random());
+
+        //user gets these
+
+        var userArray = [shuffled[0], shuffled[1], shuffled[2]].sort(
+          (a, b) => a.value - b.value
+        );
+
+        //dealer gets these
+
+        var dealerArray = [shuffled[3], shuffled[4], shuffled[5]].sort(
+          (a, b) => a.value - b.value
+        );
+        let s = " ";
+
+        //Print the array on the document
+
+        document.getElementById("user").innerHTML =
+          "User cards :" +
+          userArray[0].card +
+          userArray[0].symbol +
+          s +
+          userArray[1].card +
+          userArray[1].symbol +
+          s +
+          userArray[2].card +
+          userArray[2].symbol;
+
+        document.getElementById("dealer").innerHTML =
+          "Dealer cards :" +
+          dealerArray[0].card +
+          dealerArray[0].symbol +
+          s +
+          dealerArray[1].card +
+          dealerArray[1].symbol +
+          s +
+          dealerArray[2].card +
+          dealerArray[2].symbol;
+
+        //check trio function
+
+        function trio(array) {
+          return array[0].card === array[1].card &&
+            array[0].card === array[2].card
+            ? true
+            : false;
+        }
+
+        //check flush function
+        function flush(array) {
+          return array[0].symbol === array[1].symbol &&
+            array[0].symbol === array[2].symbol
+            ? true
+            : false;
+        }
+
+        //check sequence function
+        function sequence(array) {
+          return array[0].value + 1 === array[1].value &&
+            array[0].value + 2 === array[2].value
+            ? true
+            : array[0].card === 2 &&
+              array[1].card === 3 &&
+              array[2].card === "A"
+            ? true
+            : false;
+        }
+
+        //check pure sequence function
+        function pureSequence(array) {
+          return sequence(array) && flush(array) ? true : false;
+        }
+
+        //check pair function
+        function pair(array) {
+          return array[0].card === array[1].card ||
+            array[0].card === array[2].card ||
+            array[1].card === array[2].card
+            ? true
+            : false;
+        }
+
+        //comparision functions
+
+        function pattern(array) {
+          return trio(array)
+            ? "trio"
+            : pureSequence(array)
+            ? "Pure Sequence"
+            : sequence(array)
+            ? "sequence"
+            : flush(array)
+            ? "flush"
+            : pair(array)
+            ? "pair"
+            : "no Pattern";
+        }
+
+        //case of pair
+
+        function compare(array1, array2) {
+          if (pattern(array1) === "pair" && pattern(array2) === "pair") {
+            //check the two cards that are similar and compare them first
+            // return "Both pair";
+            let array1paircardvalue =
+              array1[0].card === array1[1].card
+                ? array1[0].value
+                : array1[2].value;
+            let array2paircardvalue =
+              array2[0].card === array2[1].card
+                ? array2[0].value
+                : array2[2].value;
+            //this part may need to be edited in future cause i don't know how to return array's name for now so i'm just typing the thing
+            if (array1paircardvalue > array2paircardvalue) {
+              return "user";
+            } else if (array1paircardvalue < array2paircardvalue) {
+              return "dealer";
+            } else if (array1paircardvalue === array2paircardvalue) {
+              return "draw";
+            } else {
+              alert(
+                "I have found a bug in the program. I'm a single line of code made to be alerted only when I sense a bug. Please contact Mr. Shrestha at Subham.hero01@gmail.com"
+              );
+            }
+          } else if (
+            pattern(array1) !== "no Pattern" &&
+            pattern(array2) !== "no Pattern" &&
+            pattern(array1) !== pattern(array2)
+          ) {
+            //if both has different patterns
+            return trio(array1)
+              ? "user"
+              : trio(array2)
+              ? "dealer"
+              : pureSequence(array1)
+              ? "user"
+              : pureSequence(array2)
+              ? "dealer"
+              : sequence(array1)
+              ? "user"
+              : sequence(array2)
+              ? "dealer"
+              : flush(array1)
+              ? "user"
+              : flush(array2)
+              ? "dealer"
+              : alert(
+                  "A potential bug has been found. Please contact Subham.hero01@gmail.com"
+                );
+          } else if (pattern(array1) === pattern(array2)) {
+            //if both player has same pattern
+            return array1[2].value > array2[2].value
+              ? "user"
+              : array1[2].value < array2[2].value
+              ? "dealer"
+              : array1[1].value > array2[1].value
+              ? "user"
+              : array1[1].value < array2[1].value
+              ? "dealer"
+              : array1[0].value > array2[0].value
+              ? "user"
+              : array1[0].value < array2[0].value
+              ? "dealer"
+              : "draw";
+          } else if (
+            //if one player had no pattern while other has
+            pattern(array1) !== "no Pattern" &&
+            pattern(array2) === "no Pattern"
+          ) {
+            return "user";
+          } else if (
+            //if one player had no pattern while other has
+            pattern(array2) !== "no Pattern" &&
+            pattern(array1) === "no Pattern"
+          ) {
+            return "dealer";
+          } else if (
+            //if both have no pattern
+            pattern(array1) === "no Pattern" &&
+            pattern(array2) === "no Pattern"
+          ) {
+            return array1[2].value > array2[2].value
+              ? "user"
+              : array1[2].value < array2[2].value
+              ? "dealer"
+              : array1[1].value > array2[1].value
+              ? "user"
+              : array1[1].value < array2[1].value
+              ? "dealer"
+              : array1[0].value > array2[0].value
+              ? "user"
+              : array1[0].value < array2[0].value
+              ? "dealer"
+              : "draw";
+          }
+          //the above code only returns either user dealer or draw
+        }
+
+        //Clear console
+        console.clear();
+
+        //testing logs user
+        // console.log(trio(userArray) + " User trio");
+        // console.log(flush(userArray) + " User flush");
+        // console.log(sequence(userArray) + " User sequence");
+        // console.log(pureSequence(userArray) + " User pure sequence");
+        // console.log(pair(userArray) + " User pair");
+
+        console.log("User got " + pattern(userArray));
+
+        //testing logs dealer
+        console.log("-------------------------");
+        //adding a horizontal line for testing pursposes
+
+        // console.log(trio(dealerArray) + " Dealer trio");
+        // console.log(flush(dealerArray) + " Dealer flush");
+        // console.log(sequence(dealerArray) + " Dealer sequence");
+        // console.log(pureSequence(dealerArray) + " Dealer pure sequence");
+        // console.log(pair(dealerArray) + " Dealer pair");
+
+        console.log("Dealer got " + pattern(dealerArray));
+        console.log("-------------------------");
+        console.log(compare(userArray, dealerArray));
+      }
+    </script>
+  </body>
+</html>
